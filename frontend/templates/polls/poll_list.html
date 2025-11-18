@@ -3,7 +3,7 @@
 <h1>Polls</h1>
 <ul>
   {% for p in polls %}
-    <li><a href="{% url 'poll_detail' p.id %}">{{ p.question }}</a></li>
+    <li><a href="{% url 'poll_detail' p.slug %}">{{ p.question }}</a></li>
   {% empty %}
     <li>No polls yet.</li>
   {% endfor %}

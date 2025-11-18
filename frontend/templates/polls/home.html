@@ -1,6 +1,12 @@
-{% extends 'base.html' %}
-{% block title %}Home - Polls{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Home | Poll App{% endblock %}
+
 {% block content %}
 <h1>Welcome to Poll App</h1>
-<p>Create polls, share by link, let people vote.</p>
+<p>Create polls, share link, let people vote.</p>
+
+<a href="{% url 'poll_list' %}">
+    <button>View All Polls</button>
+</a>
 {% endblock %}
