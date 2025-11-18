@@ -2,13 +2,32 @@
 {% block content %}
 <h1>{{ poll.question }}</h1>
 
+{% if not poll.is_public and user.is_authenticated and poll.owner == user %}
+<div class="share-section">
+    <h3>Share this private poll:</h3>
+    <input type="text" 
+           value="{{ request.scheme }}://{{ request.get_host }}{% url 'poll_detail' poll.slug %}?code={{ poll.private_code }}" 
+           readonly 
+           onclick="this.select(); document.execCommand('copy'); alert('Link copied!');"
+           style="width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+</div>
+{% endif %}
+
 <ul>
   {% for choice in poll.choices.all %}
     <li>
       {{ choice.text }} — {{ choice.votes }} votes
-      <a href="{% url 'vote' choice.id %}">
-         <button>Vote</button>
-      </a>
+      {% if user.is_authenticated and not user_voted %}
+        <a href="{% url 'vote' choice.id %}">
+           <button>Vote</button>
+        </a>
+      {% elif user_voted %}
+        <button disabled>Already Voted</button>
+      {% else %}
+        <a href="{% url 'login' %}">
+           <button>Login to Vote</button>
+        </a>
+      {% endif %}
     </li>
   {% endfor %}
 </ul>

@@ -5,7 +5,7 @@ from polls.models import Poll, Choice, VoteRecord
 from .serializers import PollSerializer, ChoiceSerializer
 
 class PollViewSet(viewsets.ModelViewSet):
-    queryset = Poll.objects.all().order_by('-created_at')
+    queryset = Poll.objects.select_related('owner').prefetch_related('choices').filter(is_public=True).order_by('-created_at')
     serializer_class = PollSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 

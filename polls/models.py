@@ -15,7 +15,13 @@ class Poll(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.question)
+            base_slug = slugify(self.question)
+            slug = base_slug
+            counter = 1
+            while Poll.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def __str__(self):
