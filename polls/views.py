@@ -63,4 +63,4 @@ def vote(request, pk):
     choice.votes += 1
     choice.save()
 
-    return redirect('poll_detail', slug=poll.slug)
+    return redirect('poll_list')
