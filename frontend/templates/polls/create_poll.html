@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Create a New Poll</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <h3>Poll Question</h3>
+    {{ form.as_p }}
+
+    <h3>Choices</h3>
+    {{ formset.management_form }}
+    {% for form in formset %}
+        {{ form.as_p }}
+    {% endfor %}
+
+    <button type="submit">Create Poll</button>
+</form>
+{% endblock %}

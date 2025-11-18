@@ -1,9 +1,16 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
 <h1>{{ poll.question }}</h1>
+
 <ul>
-  {% for c in poll.choices.all %}
-    <li>{{ c }}</li>
+  {% for choice in poll.choices.all %}
+    <li>
+      {{ choice.text }} — {{ choice.votes }} votes
+      <a href="{% url 'vote' choice.id %}">
+         <button>Vote</button>
+      </a>
+    </li>
   {% endfor %}
 </ul>
+
 {% endblock %}
