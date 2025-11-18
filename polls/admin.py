@@ -6,7 +6,7 @@ class ChoiceInline(admin.TabularInline):
     extra = 2
 
 class PollAdmin(admin.ModelAdmin):
-    list_display = ("question", "is_public", "created_at")
+    list_display = ("question", "owner", "is_public", "created_at")
     prepopulated_fields = {"slug": ("question",)}
     inlines = [ChoiceInline]
 
