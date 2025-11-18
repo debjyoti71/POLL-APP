@@ -8,7 +8,7 @@ load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-key')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -62,9 +62,11 @@ WSGI_APPLICATION = 'poll_app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': ':memory:',
     }
 }
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
