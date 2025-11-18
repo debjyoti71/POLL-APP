@@ -1,0 +1,39 @@
+POLL_APP/
+│
+├── manage.py
+│
+├── poll_app/                     ← Project Config Folder
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+│
+├── polls/                        ← Your main app
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations/
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+│
+├── frontend/     
+│   ├── templates/                    ← Global templates folder
+│   │   ├── base.html                 ← Master layout
+│   │   └── polls/
+│   │       ├── home.html             ← Example page
+│   │       ├── poll_list.html
+│   │       ├── poll_detail.html
+│   │
+│   └── static/                       ← Global static files folder
+│       ├── css/
+│       │   └── style.css
+│       ├── js/
+│       └── images/
+│
+├── .env                          ← Environment variables
+│
+└── requirements.txt
