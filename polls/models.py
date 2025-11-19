@@ -1,7 +1,30 @@
 from django.db import models
 import uuid
 from django.utils.text import slugify
-from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password, check_password
+
+class User(models.Model):
+    username = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=255)
+    super_user = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.username
+
+    def save(self, *args, **kwargs):
+        if not self.username:
+            self.username = self.email.split('@')[0]
+        super().save(*args, **kwargs)
+    
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+    
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.password)
+
+
 
 class Poll(models.Model):
     question = models.CharField(max_length=255)

@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from polls.models import Poll, Choice
-from django.contrib.auth.models import User
+from polls.models import Poll, Choice, User
 
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:

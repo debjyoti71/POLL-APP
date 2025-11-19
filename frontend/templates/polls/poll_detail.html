@@ -2,7 +2,7 @@
 {% block content %}
 <h1>{{ poll.question }}</h1>
 
-{% if not poll.is_public and user.is_authenticated and poll.owner == user %}
+{% if not poll.is_public and current_user and poll.owner == current_user %}
 <div class="share-section">
     <h3>Share this private poll:</h3>
     <input type="text" 
@@ -17,7 +17,7 @@
   {% for choice in poll.choices.all %}
     <li>
       {{ choice.text }} — {{ choice.votes }} votes
-      {% if user.is_authenticated and not user_voted %}
+      {% if current_user and not user_voted %}
         <a href="{% url 'vote' choice.id %}">
            <button>Vote</button>
         </a>

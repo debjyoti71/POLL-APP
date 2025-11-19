@@ -1,6 +1,5 @@
 from django.urls import path
-from . import views
-from . import auth_views
+from . import views, auth_views
 
 urlpatterns = [
     # Home
@@ -16,7 +15,7 @@ urlpatterns = [
     path('vote/<int:pk>/', views.vote, name='vote'),
 
     # Auth pages
-    path('register/', auth_views.register_view, name='register'),
-    path('login/', auth_views.login_view, name='login'),
-    path('logout/', auth_views.logout_view, name='logout'),
+    path('register/', auth_views.register, name='register'),
+    path('login/', auth_views.user_login, name='login'),
+    path('logout/', auth_views.user_logout, name='logout'),
 ]

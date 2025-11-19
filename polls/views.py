@@ -1,9 +1,29 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.http import Http404
-from .models import Poll, Choice, VoteRecord
+from functools import wraps
+from .models import Poll, Choice, VoteRecord, User
 from .forms import PollForm, ChoiceFormSet
-from django.contrib.auth.decorators import login_required
+
+def login_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        user_id = request.session.get('user_id')
+        print(f"DEBUG: login_required check - session user_id: {user_id}")
+        if not user_id:
+            messages.error(request, 'Please log in to access this page.')
+            return redirect('login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+def get_current_user(request):
+    user_id = request.session.get('user_id')
+    if user_id:
+        try:
+            return User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            pass
+    return None
 
 def home(request):
     return render(request, 'polls/home.html')
@@ -17,7 +37,8 @@ def poll_detail(request, slug):
 
     if not poll.is_public:
         # Allow owner to always see their poll
-        if request.user.is_authenticated and poll.owner == request.user:
+        current_user = get_current_user(request)
+        if current_user and poll.owner == current_user:
             pass  # Owner can always access
         else:
             code = request.GET.get("code")
@@ -26,12 +47,14 @@ def poll_detail(request, slug):
 
     # Check if user already voted
     user_voted = False
-    if request.user.is_authenticated:
-        user_voted = VoteRecord.objects.filter(user=request.user, poll=poll).exists()
+    current_user = get_current_user(request)
+    if current_user:
+        user_voted = VoteRecord.objects.filter(user=current_user, poll=poll).exists()
 
     return render(request, 'polls/poll_detail.html', {
         'poll': poll,
-        'user_voted': user_voted
+        'user_voted': user_voted,
+        'current_user': current_user
     })
 
 
@@ -43,7 +66,7 @@ def create_poll(request):
 
         if form.is_valid() and formset.is_valid():
             poll = form.save(commit=False)
-            poll.owner = request.user    # assign poll creator
+            poll.owner = get_current_user(request)    # assign poll creator
             poll.save()
 
             formset.instance = poll
@@ -63,7 +86,8 @@ def create_poll(request):
 
 @login_required
 def my_polls(request):
-    polls = Poll.objects.filter(owner=request.user).order_by('-created_at')
+    current_user = get_current_user(request)
+    polls = Poll.objects.filter(owner=current_user).order_by('-created_at')
     return render(request, 'polls/my_polls.html', {'polls': polls})
 
 
@@ -74,12 +98,13 @@ def vote(request, pk):
         poll = choice.poll
 
         # check if user already voted
-        if VoteRecord.objects.filter(user=request.user, poll=poll).exists():
+        current_user = get_current_user(request)
+        if VoteRecord.objects.filter(user=current_user, poll=poll).exists():
             messages.warning(request, 'You have already voted on this poll.')
             return redirect('poll_detail', slug=poll.slug)
 
         # record first vote
-        VoteRecord.objects.create(user=request.user, poll=poll)
+        VoteRecord.objects.create(user=current_user, poll=poll)
 
         # increment actual vote
         choice.votes += 1
@@ -90,3 +115,5 @@ def vote(request, pk):
     except Exception as e:
         messages.error(request, 'An error occurred while voting.')
         return redirect('poll_list')
+
+
