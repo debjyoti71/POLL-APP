@@ -3,11 +3,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from polls.models import Poll, Choice, VoteRecord, User
 from .serializers import PollSerializer, ChoiceSerializer
+from .permissions import IsSuperAdminAuthenticated
 
 class PollViewSet(viewsets.ModelViewSet):
-    queryset = Poll.objects.select_related('owner').prefetch_related('choices').filter(is_public=True).order_by('-created_at')
+    queryset = Poll.objects.select_related('owner').prefetch_related('choices').order_by('-created_at')
     serializer_class = PollSerializer
-    permission_classes = []
+    permission_classes = [IsSuperAdminAuthenticated]
 
     def perform_create(self, serializer):
         # Get user from session for custom auth
@@ -63,5 +64,5 @@ class PollViewSet(viewsets.ModelViewSet):
 class ChoiceViewSet(viewsets.ModelViewSet):
     queryset = Choice.objects.all()
     serializer_class = ChoiceSerializer
-    permission_classes = []
+    permission_classes = [IsSuperAdminAuthenticated]
 

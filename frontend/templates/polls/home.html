@@ -6,7 +6,10 @@
 <h1>Welcome to Poll App</h1>
 <p>Create polls, share link, let people vote.</p>
 
-<a href="{% url 'poll_list' %}">
-    <button>View All Polls</button>
-</a>
+<a href="{% url 'poll_list' %}" class="button-link">View All Polls</a>
+
+{% comment %} 
+<div class="alert alert-success">Your registration was successful!</div>
+{% endcomment %}
+
 {% endblock %}
