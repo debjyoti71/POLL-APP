@@ -55,8 +55,10 @@ TEMPLATES = [
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'frontend' / 'static',   # <— CHANGE THIS
+    BASE_DIR / 'frontend' / 'static',
 ]
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 

@@ -1,11 +1,31 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Polls</h1>
-<ul>
+<h1>🗳️ All Polls</h1>
+
+{% if current_user %}
+    <div style="margin-bottom: 25px;">
+        <a href="{% url 'create_poll' %}" class="button-link">➕ Create New Poll</a>
+    </div>
+{% endif %}
+
+<div class="poll-grid">
   {% for p in polls %}
-    <li><a href="{% url 'poll_detail' p.slug %}">{{ p.question }}</a></li>
+    <div class="poll-item">
+        <h3><a href="{% url 'poll_detail' p.slug %}" style="text-decoration: none; color: #4a5568;">{{ p.question }}</a></h3>
+        <div class="poll-meta">
+            <span>👤 {{ p.owner.username|default:"Anonymous" }}</span>
+            <span>📅 {{ p.created_at|date:"M d, Y" }}</span>
+            <span>📊 {{ p.choices.count }} choices</span>
+        </div>
+    </div>
   {% empty %}
-    <li>No polls yet.</li>
+    <div style="text-align: center; color: #666; padding: 40px;">
+        <h3>😕 No polls available yet</h3>
+        <p>Be the first to create a poll!</p>
+        {% if current_user %}
+            <a href="{% url 'create_poll' %}" class="button-link">➕ Create First Poll</a>
+        {% endif %}
+    </div>
   {% endfor %}
-</ul>
+</div>
 {% endblock %}

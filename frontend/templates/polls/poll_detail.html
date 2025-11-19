@@ -1,35 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>{{ poll.question }}</h1>
+<div style="text-align: center; margin-bottom: 30px;">
+    <h1>🗳️ {{ poll.question }}</h1>
+    <div class="poll-meta" style="color: #666; margin-top: 10px;">
+        <span>👤 By {{ poll.owner.username|default:"Anonymous" }}</span> | 
+        <span>📅 {{ poll.created_at|date:"M d, Y" }}</span>
+    </div>
+</div>
 
 {% if not poll.is_public and current_user and poll.owner == current_user %}
-<div class="share-section">
-    <h3>Share this private poll:</h3>
+<div class="share-section" style="background: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+    <h3>🔗 Share this private poll:</h3>
     <input type="text" 
            value="{{ request.scheme }}://{{ request.get_host }}{% url 'poll_detail' poll.slug %}?code={{ poll.private_code }}" 
            readonly 
            onclick="this.select(); document.execCommand('copy'); alert('Link copied!');"
-           style="width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+           style="cursor: pointer;">
+    <small style="display: block; margin-top: 5px; color: #666;">Click to copy link</small>
 </div>
 {% endif %}
 
-<ul>
+<div class="choices-container">
   {% for choice in poll.choices.all %}
-    <li>
-      {{ choice.text }} — {{ choice.votes }} votes
-      {% if current_user and not user_voted %}
-        <a href="{% url 'vote' choice.id %}">
-           <button>Vote</button>
-        </a>
-      {% elif user_voted %}
-        <button disabled>Already Voted</button>
-      {% else %}
-        <a href="{% url 'login' %}">
-           <button>Login to Vote</button>
-        </a>
-      {% endif %}
-    </li>
+    <div class="choice-item" style="background: rgba(255, 255, 255, 0.8); margin: 15px 0; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="choice-info">
+            <strong>{{ choice.text }}</strong>
+            <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                📊 {{ choice.votes }} vote{{ choice.votes|pluralize }}
+            </div>
+        </div>
+        <div class="choice-action">
+            {% if current_user and not user_voted %}
+                <a href="{% url 'vote' choice.id %}" class="button-link">✅ Vote</a>
+            {% elif user_voted %}
+                <button disabled style="background: #28a745;">✓ Voted</button>
+            {% else %}
+                <a href="{% url 'login' %}" class="button-link">🔑 Login to Vote</a>
+            {% endif %}
+        </div>
+    </div>
   {% endfor %}
-</ul>
+</div>
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{% url 'poll_list' %}" style="color: #667eea; text-decoration: none;">← Back to All Polls</a>
+</div>
 
 {% endblock %}

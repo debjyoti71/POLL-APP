@@ -3,13 +3,17 @@
 {% block title %}Home | Poll App{% endblock %}
 
 {% block content %}
-<h1>Welcome to Poll App</h1>
-<p>Create polls, share link, let people vote.</p>
-
-<a href="{% url 'poll_list' %}" class="button-link">View All Polls</a>
-
-{% comment %} 
-<div class="alert alert-success">Your registration was successful!</div>
-{% endcomment %}
-
+<div style="text-align: center;">
+    <h1>🗳️ Welcome to Poll App</h1>
+    <p style="font-size: 1.2em; color: #666; margin-bottom: 30px;">Create engaging polls, share with friends, and gather opinions instantly!</p>
+    
+    <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 30px;">
+        <a href="{% url 'poll_list' %}" class="button-link">📊 Browse Polls</a>
+        {% if current_user %}
+            <a href="{% url 'create_poll' %}" class="button-link">➕ Create New Poll</a>
+        {% else %}
+            <a href="{% url 'register' %}" class="button-link">🚀 Get Started</a>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

@@ -7,6 +7,57 @@
     <title>{% block title %}Poll App{% endblock %}</title>
 
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/additional.css' %}">
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; color: #333;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px; margin-bottom: 30px; padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        nav { display: flex; gap: 25px; align-items: center; justify-content: center; flex-wrap: wrap; }
+        nav a {
+            text-decoration: none; color: #4a5568; font-weight: 600;
+            padding: 10px 20px; border-radius: 25px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.7);
+        }
+        nav a:hover {
+            background: #667eea; color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px; padding: 25px; margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .alert {
+            padding: 15px 20px; margin: 10px 0; border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-left: 4px solid #28a745;
+        }
+        button, input[type="submit"], .button-link {
+            padding: 12px 25px; margin: 8px 5px; border: none;
+            border-radius: 25px; cursor: pointer; font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; text-decoration: none; display: inline-block;
+            transition: all 0.3s ease;
+        }
+        button:hover, .button-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+    </style>
 </head>
 
 <body>
@@ -36,9 +87,11 @@
                 {% endfor %}
             </div>
         {% endif %}
-        
-        {% block content %}
-        {% endblock %}
+            
+        <div class="card">
+            {% block content %}
+            {% endblock %}
+        </div>
     </main>
 
 </body>
