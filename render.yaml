@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: poll-app
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn poll_app.wsgi:application"
+    staticPublishPath: "staticfiles"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10
