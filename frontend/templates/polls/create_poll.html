@@ -1,19 +1,94 @@
 {% extends "base.html" %}
+
+{% block title %}Create Poll | PollHub{% endblock %}
+
 {% block content %}
-<h1>Create a New Poll</h1>
+<div style="max-width: 600px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1>➕ Create New Poll</h1>
+        <p style="color: #666;">Ask a question and let people vote</p>
+    </div>
 
-<form method="POST">
-    {% csrf_token %}
-    
-    <h3>Poll Question</h3>
-    {{ form.as_p }}
+    <form method="POST">
+        {% csrf_token %}
+        
+        <label for="id_question">Poll Question</label>
+        <input type="text" name="question" id="id_question" required 
+               placeholder="What would you like to ask?">
+        
+        <div style="display: flex; align-items: center; gap: 10px; margin: 20px 0;">
+            <input type="checkbox" name="is_public" id="id_is_public" checked>
+            <label for="id_is_public" style="margin: 0;">Make this poll public</label>
+        </div>
+        
+        <h3 style="margin-top: 30px;">Poll Choices</h3>
+        <div id="choices-container">
+            <div class="choice-input">
+                <label>Choice 1</label>
+                <input type="text" name="form-0-text" placeholder="Enter choice option" required>
+            </div>
+            <div class="choice-input">
+                <label>Choice 2</label>
+                <input type="text" name="form-1-text" placeholder="Enter choice option" required>
+            </div>
+        </div>
+        
+        <button type="button" onclick="addChoice()" style="background: #28a745; margin: 10px 0;">
+            ➕ Add Another Choice
+        </button>
+        
+        <!-- Hidden formset management fields -->
+        <input type="hidden" name="form-TOTAL_FORMS" value="2" id="id_form-TOTAL_FORMS">
+        <input type="hidden" name="form-INITIAL_FORMS" value="0">
+        <input type="hidden" name="form-MIN_NUM_FORMS" value="0">
+        <input type="hidden" name="form-MAX_NUM_FORMS" value="1000">
+        
+        <button type="submit" style="width: 100%; margin-top: 30px;">
+            🗳️ Create Poll
+        </button>
+    </form>
+</div>
 
-    <h3>Choices</h3>
-    {{ formset.management_form }}
-    {% for form in formset %}
-        {{ form.as_p }}
-    {% endfor %}
+<script>
+let choiceCount = 2;
 
-    <button type="submit">Create Poll</button>
-</form>
+function addChoice() {
+    const container = document.getElementById('choices-container');
+    const newChoice = document.createElement('div');
+    newChoice.className = 'choice-input';
+    newChoice.innerHTML = `
+        <label>Choice ${choiceCount + 1}</label>
+        <input type="text" name="form-${choiceCount}-text" placeholder="Enter choice option">
+        <button type="button" onclick="removeChoice(this)" style="background: #dc3545; padding: 5px 10px; margin-left: 10px;">✕</button>
+    `;
+    container.appendChild(newChoice);
+    choiceCount++;
+    document.getElementById('id_form-TOTAL_FORMS').value = choiceCount;
+}
+
+function removeChoice(button) {
+    if (choiceCount > 2) {
+        button.parentElement.remove();
+        choiceCount--;
+        document.getElementById('id_form-TOTAL_FORMS').value = choiceCount;
+    }
+}
+</script>
+
+<style>
+.choice-input {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.choice-input label {
+    min-width: 80px;
+    margin: 0;
+}
+.choice-input input {
+    flex: 1;
+    margin: 0;
+}
+</style>
 {% endblock %}

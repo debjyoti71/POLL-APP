@@ -61,27 +61,30 @@ def poll_detail(request, slug):
 @login_required
 def create_poll(request):
     if request.method == "POST":
-        form = PollForm(request.POST)
-        formset = ChoiceFormSet(request.POST)
-
-        if form.is_valid() and formset.is_valid():
-            poll = form.save(commit=False)
-            poll.owner = get_current_user(request)    # assign poll creator
-            poll.save()
-
-            formset.instance = poll
-            formset.save()
-
+        question = request.POST.get('question')
+        is_public = request.POST.get('is_public') == 'on'
+        
+        if question:
+            # Create poll
+            poll = Poll.objects.create(
+                question=question,
+                is_public=is_public,
+                owner=get_current_user(request)
+            )
+            
+            # Create choices
+            total_forms = int(request.POST.get('form-TOTAL_FORMS', 0))
+            for i in range(total_forms):
+                choice_text = request.POST.get(f'form-{i}-text')
+                if choice_text:
+                    Choice.objects.create(poll=poll, text=choice_text)
+            
+            messages.success(request, 'Poll created successfully!')
             return redirect('poll_detail', slug=poll.slug)
+        else:
+            messages.error(request, 'Please provide a question for your poll.')
     
-    else:
-        form = PollForm()
-        formset = ChoiceFormSet()
-
-    return render(request, 'polls/create_poll.html', {
-        'form': form,
-        'formset': formset
-    })
+    return render(request, 'polls/create_poll.html')
 
 
 @login_required

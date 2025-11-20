@@ -1,49 +1,65 @@
 {% extends "base.html" %}
+
+{% block title %}{{ poll.question }} | PollHub{% endblock %}
+
 {% block content %}
 <div style="text-align: center; margin-bottom: 30px;">
     <h1>🗳️ {{ poll.question }}</h1>
-    <div class="poll-meta" style="color: #666; margin-top: 10px;">
+    <div style="color: #666; margin-top: 10px;">
         <span>👤 By {{ poll.owner.username|default:"Anonymous" }}</span> | 
         <span>📅 {{ poll.created_at|date:"M d, Y" }}</span>
+        {% if not poll.is_public %}
+            | <span style="color: #856404;">🔒 Private Poll</span>
+        {% endif %}
     </div>
 </div>
 
 {% if not poll.is_public and current_user and poll.owner == current_user %}
-<div class="share-section" style="background: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+<div style="background: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 10px; margin-bottom: 25px;">
     <h3>🔗 Share this private poll:</h3>
     <input type="text" 
            value="{{ request.scheme }}://{{ request.get_host }}{% url 'poll_detail' poll.slug %}?code={{ poll.private_code }}" 
            readonly 
-           onclick="this.select(); document.execCommand('copy'); alert('Link copied!');"
-           style="cursor: pointer;">
+           onclick="copyToClipboard(this.value)"
+           style="cursor: pointer; width: 100%;">
     <small style="display: block; margin-top: 5px; color: #666;">Click to copy link</small>
 </div>
 {% endif %}
 
-<div class="choices-container">
-  {% for choice in poll.choices.all %}
-    <div class="choice-item" style="background: rgba(255, 255, 255, 0.8); margin: 15px 0; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-        <div class="choice-info">
-            <strong>{{ choice.text }}</strong>
-            <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
-                📊 {{ choice.votes }} vote{{ choice.votes|pluralize }}
+<div style="margin: 25px 0;">
+    {% for choice in poll.choices.all %}
+        <div style="background: rgba(255, 255, 255, 0.8); margin: 15px 0; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong>{{ choice.text }}</strong>
+                <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                    📊 {{ choice.votes }} vote{{ choice.votes|pluralize }}
+                </div>
+                {% if choice.votes > 0 %}
+                    <div style="background: #667eea; height: 8px; border-radius: 4px; margin-top: 8px; width: {{ choice.votes|add:0 }}0px; max-width: 200px;"></div>
+                {% endif %}
+            </div>
+            <div>
+                {% if current_user and not user_voted %}
+                    <a href="{% url 'vote' choice.id %}" class="button-link">✅ Vote</a>
+                {% elif user_voted %}
+                    <button disabled style="background: #28a745; cursor: not-allowed;">✓ Voted</button>
+                {% else %}
+                    <a href="{% url 'login' %}" class="button-link">🔑 Login to Vote</a>
+                {% endif %}
             </div>
         </div>
-        <div class="choice-action">
-            {% if current_user and not user_voted %}
-                <a href="{% url 'vote' choice.id %}" class="button-link">✅ Vote</a>
-            {% elif user_voted %}
-                <button disabled style="background: #28a745;">✓ Voted</button>
-            {% else %}
-                <a href="{% url 'login' %}" class="button-link">🔑 Login to Vote</a>
-            {% endif %}
-        </div>
-    </div>
-  {% endfor %}
+    {% endfor %}
 </div>
 
 <div style="text-align: center; margin-top: 30px;">
     <a href="{% url 'poll_list' %}" style="color: #667eea; text-decoration: none;">← Back to All Polls</a>
 </div>
 
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Link copied to clipboard!');
+    });
+}
+</script>
 {% endblock %}

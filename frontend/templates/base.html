@@ -3,96 +3,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Poll App{% endblock %}</title>
-
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'css/additional.css' %}">
-    <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh; color: #333;
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px; margin-bottom: 30px; padding: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-        nav { display: flex; gap: 25px; align-items: center; justify-content: center; flex-wrap: wrap; }
-        nav a {
-            text-decoration: none; color: #4a5568; font-weight: 600;
-            padding: 10px 20px; border-radius: 25px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.7);
-        }
-        nav a:hover {
-            background: #667eea; color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px; padding: 25px; margin: 20px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-        }
-        .alert {
-            padding: 15px 20px; margin: 10px 0; border-radius: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            border-left: 4px solid #28a745;
-        }
-        button, input[type="submit"], .button-link {
-            padding: 12px 25px; margin: 8px 5px; border: none;
-            border-radius: 25px; cursor: pointer; font-weight: 600;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; text-decoration: none; display: inline-block;
-            transition: all 0.3s ease;
-        }
-        button:hover, .button-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-    </style>
 </head>
-
 <body>
-    <header>
-        <nav>
-            <a href="{% url 'home' %}">Home</a>
-            <a href="{% url 'poll_list' %}">Polls</a>
-            
-            {% if current_user %}
-                <a href="{% url 'create_poll' %}">Create Poll</a>
-                <a href="{% url 'my_polls' %}">My Polls</a>
-                <a href="{% url 'logout' %}">Logout ({{ current_user.username }})</a>
-            {% else %}
-                <a href="{% url 'login' %}">Login</a>
-                <a href="{% url 'register' %}">Register</a>
-            {% endif %}
-        </nav>
-    </header>
-
-    <main class="container">
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+    <div class="container-wrapper">
+        <!-- Navigation Header -->
+        <header class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">
+                    <h1 class="brand-logo">🗳️ PollHub</h1>
+                </div>
+                
+                <nav class="navbar-menu">
+                    <a href="{% url 'home' %}" class="nav-link">Home</a>
+                    <a href="{% url 'poll_list' %}" class="nav-link">Polls</a>
+                    
+                    {% if current_user %}
+                        <a href="{% url 'create_poll' %}" class="nav-link nav-link-highlight">Create Poll</a>
+                        <a href="{% url 'my_polls' %}" class="nav-link">My Polls</a>
+                        {% if current_user.super_user %}
+                            <a href="/api/polls/" target="_blank" class="nav-link">API</a>
+                        {% endif %}
+                        <span class="nav-user">{{ current_user.username }}</span>
+                        <a href="{% url 'logout' %}" class="nav-link nav-logout">Logout</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="nav-link">Login</a>
+                        <a href="{% url 'register' %}" class="nav-link nav-link-highlight">Sign Up</a>
+                    {% endif %}
+                </nav>
             </div>
-        {% endif %}
-            
-        <div class="card">
-            {% block content %}
-            {% endblock %}
-        </div>
-    </main>
+        </header>
 
+        <!-- Messages Container -->
+        {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }}">
+                <div class="alert-content">
+                    <span class="alert-message">{{ message }}</span>
+                    <button class="alert-close" onclick="this.parentElement.parentElement.style.display='none';">&times;</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="card">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 PollHub. Create, Share, and Discover Polls.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
