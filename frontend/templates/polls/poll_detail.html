@@ -3,62 +3,105 @@
 {% block title %}{{ poll.question }} | PollHub{% endblock %}
 
 {% block content %}
-<div style="text-align: center; margin-bottom: 30px;">
-    <h1>🗳️ {{ poll.question }}</h1>
-    <div style="color: #666; margin-top: 10px;">
-        <span>👤 By {{ poll.owner.username|default:"Anonymous" }}</span> | 
-        <span>📅 {{ poll.created_at|date:"M d, Y" }}</span>
-        {% if not poll.is_public %}
-            | <span style="color: #856404;">🔒 Private Poll</span>
-        {% endif %}
-    </div>
-</div>
-
-{% if not poll.is_public and current_user and poll.owner == current_user %}
-<div style="background: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 10px; margin-bottom: 25px;">
-    <h3>🔗 Share this private poll:</h3>
-    <input type="text" 
-           value="{{ request.scheme }}://{{ request.get_host }}{% url 'poll_detail' poll.slug %}?code={{ poll.private_code }}" 
-           readonly 
-           onclick="copyToClipboard(this.value)"
-           style="cursor: pointer; width: 100%;">
-    <small style="display: block; margin-top: 5px; color: #666;">Click to copy link</small>
-</div>
-{% endif %}
-
-<div style="margin: 25px 0;">
-    {% for choice in poll.choices.all %}
-        <div style="background: rgba(255, 255, 255, 0.8); margin: 15px 0; padding: 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <strong>{{ choice.text }}</strong>
-                <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
-                    📊 {{ choice.votes }} vote{{ choice.votes|pluralize }}
-                </div>
-                {% if choice.votes > 0 %}
-                    <div style="background: #667eea; height: 8px; border-radius: 4px; margin-top: 8px; width: {{ choice.votes|add:0 }}0px; max-width: 200px;"></div>
-                {% endif %}
-            </div>
-            <div>
-                {% if current_user and not user_voted %}
-                    <a href="{% url 'vote' choice.id %}" class="button-link">✅ Vote</a>
-                {% elif user_voted %}
-                    <button disabled style="background: #28a745; cursor: not-allowed;">✓ Voted</button>
-                {% else %}
-                    <a href="{% url 'login' %}" class="button-link">🔑 Login to Vote</a>
-                {% endif %}
-            </div>
+<div class="poll-detail-container">
+    
+    <div class="page-header">
+        <h1 class="page-title poll-question-title">🗳️ {{ poll.question }}</h1>
+        <div class="poll-meta-detail">
+            <span class="meta-item">👤 By **{{ poll.owner.username|default:"Anonymous" }}**</span>
+            <span class="meta-item">|</span>
+            <span class="meta-item">📅 {{ poll.created_at|date:"M d, Y" }}</span>
+            {% if not poll.is_public %}
+                <span class="meta-item">|</span> 
+                <span class="meta-item meta-tag meta-tag-warning">🔒 Private Poll</span>
+            {% endif %}
         </div>
-    {% endfor %}
-</div>
+    </div>
 
-<div style="text-align: center; margin-top: 30px;">
-    <a href="{% url 'poll_list' %}" style="color: #667eea; text-decoration: none;">← Back to All Polls</a>
+    {% if not poll.is_public and current_user and poll.owner == current_user %}
+    <div class="share-block card-light">
+        <h3>🔗 Share this private poll:</h3>
+        <div class="form-group form-group-inline">
+            <input type="text" 
+                   value="{{ request.scheme }}://{{ request.get_host }}{% url 'poll_detail' poll.slug %}?code={{ poll.private_code }}" 
+                   readonly 
+                   onclick="copyToClipboard(this.value, this)"
+                   class="form-input share-input"
+                   id="share-link">
+            <button type="button" onclick="copyToClipboard(document.getElementById('share-link').value, this)" class="btn btn-secondary btn-copy">Copy</button>
+        </div>
+        <small class="share-help-text">Click to copy the secured link.</small>
+    </div>
+    {% endif %}
+
+    <div class="choices-results-section">
+        {% with total_votes=poll.total_votes %}
+        {% for choice in poll.choices.all %}
+            
+            {% if total_votes > 0 %}
+                {# Calculates (choice.votes / total_votes) * 100 #}
+                {% widthratio choice.votes total_votes 100 as percentage %}
+            {% else %}
+                {% with percentage=0 %}
+                {% endwith %}
+            {% endif %}
+            
+            <div class="choice-result-item card-light">
+                <div class="choice-details">
+                    <strong class="choice-text">{{ choice.text }}</strong>
+                    <div class="vote-count-text">
+                        📊 **{{ choice.votes }}** vote{{ choice.votes|pluralize }} 
+                        {% if total_votes > 0 %}
+                            ({{ percentage }}%)
+                        {% endif %}
+                    </div>
+                    
+                    {% if total_votes > 0 %}
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: {{ percentage }}%;"></div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="choice-action">
+                    {% if current_user and not user_voted %}
+                        <a href="{% url 'vote' choice.id %}" class="btn btn-primary">✅ Vote</a>
+                    {% elif user_voted %}
+                        <button disabled class="btn btn-voted">✓ Voted</button>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-secondary">🔑 Login to Vote</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+        <div class="empty-state">
+            <p>This poll has no choices yet.</p>
+        </div>
+        {% endfor %}
+        {% endwith %}
+    </div>
+
+    <div class="back-link-container">
+        <a href="{% url 'poll_list' %}" class="back-link">← Back to All Polls</a>
+    </div>
+
 </div>
 
 <script>
-function copyToClipboard(text) {
+function copyToClipboard(text, element) {
     navigator.clipboard.writeText(text).then(() => {
-        alert('Link copied to clipboard!');
+        // Temporarily change button text for feedback
+        const originalText = element.textContent;
+        element.textContent = 'Copied!';
+        element.classList.add('btn-success');
+        
+        // Change back after 1.5 seconds
+        setTimeout(() => {
+            element.textContent = originalText;
+            element.classList.remove('btn-success');
+        }, 1500);
+    }).catch(err => {
+        alert('Could not copy link: ' + err);
     });
 }
 </script>

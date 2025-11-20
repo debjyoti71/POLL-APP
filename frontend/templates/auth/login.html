@@ -3,30 +3,34 @@
 {% block title %}Login | PollHub{% endblock %}
 
 {% block content %}
-<div style="max-width: 400px; margin: 0 auto;">
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1>🔑 Welcome Back</h1>
-        <p style="color: #666;">Sign in to your PollHub account</p>
+<div class="form-container form-container-narrow">
+    <div class="page-header">
+        <h1 class="page-title">🔑 Welcome Back</h1>
+        <p class="page-subtitle">Sign in to your PollHub account</p>
     </div>
 
     <form method="POST">
         {% csrf_token %}
         
-        <label for="id_email">Email Address</label>
-        <input type="email" name="email" id="id_email" required>
+        <div class="form-group">
+            <label for="id_email">Email Address</label>
+            <input type="email" name="email" id="id_email" class="form-input" required>
+        </div>
         
-        <label for="id_password">Password</label>
-        <input type="password" name="password" id="id_password" required>
+        <div class="form-group">
+            <label for="id_password">Password</label>
+            <input type="password" name="password" id="id_password" class="form-input" required>
+        </div>
         
-        <button type="submit" style="width: 100%; margin-top: 20px;">
+        <button type="submit" class="btn btn-primary btn-submit-narrow">
             🚀 Sign In
         </button>
     </form>
     
-    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-        <p style="color: #666;">
+    <div class="form-footer">
+        <p class="form-footer-text">
             Don't have an account? 
-            <a href="{% url 'register' %}" style="color: #667eea; text-decoration: none; font-weight: 600;">
+            <a href="{% url 'register' %}" class="form-footer-link">
                 Create one here
             </a>
         </p>

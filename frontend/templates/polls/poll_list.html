@@ -3,46 +3,46 @@
 {% block title %}All Polls | PollHub{% endblock %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-    <h1>🗳️ All Polls</h1>
+<div class="list-header">
+    <h1 class="page-title">🗳️ All Polls</h1>
     {% if current_user %}
-        <a href="{% url 'create_poll' %}" class="button-link">➕ Create New Poll</a>
+        <a href="{% url 'create_poll' %}" class="btn btn-primary">➕ Create New Poll</a>
     {% endif %}
 </div>
 
-<div style="display: grid; gap: 20px;">
+<div class="poll-list-grid">
     {% for poll in polls %}
-        <div style="background: rgba(255,255,255,0.8); padding: 20px; border-radius: 10px; border-left: 4px solid #667eea;">
-            <h3>
-                <a href="{% url 'poll_detail' poll.slug %}" style="text-decoration: none; color: #4a5568;">
+        <div class="poll-card">
+            <h3 class="poll-question">
+                <a href="{% url 'poll_detail' poll.slug %}" class="poll-link">
                     {{ poll.question }}
                 </a>
             </h3>
-            <div style="display: flex; gap: 15px; font-size: 0.9em; color: #666; margin-top: 10px; flex-wrap: wrap;">
-                <span style="background: rgba(102, 126, 234, 0.1); padding: 4px 8px; border-radius: 15px;">
+            <div class="poll-meta">
+                <span class="meta-tag meta-tag-info">
                     👤 {{ poll.owner.username|default:"Anonymous" }}
                 </span>
-                <span style="background: rgba(102, 126, 234, 0.1); padding: 4px 8px; border-radius: 15px;">
+                <span class="meta-tag meta-tag-info">
                     📅 {{ poll.created_at|date:"M d, Y" }}
                 </span>
-                <span style="background: rgba(102, 126, 234, 0.1); padding: 4px 8px; border-radius: 15px;">
+                <span class="meta-tag meta-tag-info">
                     📊 {{ poll.choices.count }} choices
                 </span>
                 {% if not poll.is_public %}
-                    <span style="background: rgba(255, 193, 7, 0.2); padding: 4px 8px; border-radius: 15px; color: #856404;">
+                    <span class="meta-tag meta-tag-warning">
                         🔒 Private
                     </span>
                 {% endif %}
-            </div>
+                </div>
         </div>
     {% empty %}
-        <div style="text-align: center; color: #666; padding: 40px;">
-            <h3>😕 No polls available yet</h3>
-            <p>Be the first to create a poll!</p>
+        <div class="empty-state">
+            <h3 class="empty-state-title">😕 No polls available yet</h3>
+            <p class="empty-state-text">Be the first to create a poll!</p>
             {% if current_user %}
-                <a href="{% url 'create_poll' %}" class="button-link">➕ Create First Poll</a>
+                <a href="{% url 'create_poll' %}" class="btn btn-primary">➕ Create First Poll</a>
             {% else %}
-                <a href="{% url 'register' %}" class="button-link">🚀 Sign Up to Create</a>
+                <a href="{% url 'register' %}" class="btn btn-action-primary">🚀 Sign Up to Create</a>
             {% endif %}
         </div>
     {% endfor %}

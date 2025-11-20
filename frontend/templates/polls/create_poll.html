@@ -3,47 +3,47 @@
 {% block title %}Create Poll | PollHub{% endblock %}
 
 {% block content %}
-<div style="max-width: 600px; margin: 0 auto;">
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1>➕ Create New Poll</h1>
-        <p style="color: #666;">Ask a question and let people vote</p>
+<div class="form-container">
+    <div class="page-header">
+        <h1 class="page-title">➕ Create New Poll</h1>
+        <p class="page-subtitle">Ask a question and let people vote</p>
     </div>
 
     <form method="POST">
         {% csrf_token %}
         
-        <label for="id_question">Poll Question</label>
-        <input type="text" name="question" id="id_question" required 
-               placeholder="What would you like to ask?">
+        <div class="form-group">
+            <label for="id_question">Poll Question</label>
+            <input type="text" name="question" id="id_question" class="form-input" required 
+                   placeholder="What would you like to ask?">
+        </div>
         
-        <div style="display: flex; align-items: center; gap: 10px; margin: 20px 0;">
+        <div class="form-group form-group-inline">
             <input type="checkbox" name="is_public" id="id_is_public" checked>
-            <label for="id_is_public" style="margin: 0;">Make this poll public</label>
+            <label for="id_is_public" class="checkbox-label">Make this poll public</label>
         </div>
         
-        <h3 style="margin-top: 30px;">Poll Choices</h3>
-        <div id="choices-container">
+        <h3 class="section-title">Poll Choices</h3>
+        <div id="choices-container" class="choices-container">
             <div class="choice-input">
-                <label>Choice 1</label>
-                <input type="text" name="form-0-text" placeholder="Enter choice option" required>
+                <label for="id_form-0-text">Choice 1</label>
+                <input type="text" name="form-0-text" id="id_form-0-text" class="form-input" placeholder="Enter choice option" required>
             </div>
             <div class="choice-input">
-                <label>Choice 2</label>
-                <input type="text" name="form-1-text" placeholder="Enter choice option" required>
+                <label for="id_form-1-text">Choice 2</label>
+                <input type="text" name="form-1-text" id="id_form-1-text" class="form-input" placeholder="Enter choice option" required>
             </div>
         </div>
         
-        <button type="button" onclick="addChoice()" style="background: #28a745; margin: 10px 0;">
+        <button type="button" onclick="addChoice()" class="btn btn-add-choice">
             ➕ Add Another Choice
         </button>
         
-        <!-- Hidden formset management fields -->
         <input type="hidden" name="form-TOTAL_FORMS" value="2" id="id_form-TOTAL_FORMS">
         <input type="hidden" name="form-INITIAL_FORMS" value="0">
-        <input type="hidden" name="form-MIN_NUM_FORMS" value="0">
-        <input type="hidden" name="form-MAX_NUM_FORMS" value="1000">
+        <input type="hidden" name="form-MIN_NUM_FORMS" value="2"> <input type="hidden" name="form-MAX_NUM_FORMS" value="1000">
         
-        <button type="submit" style="width: 100%; margin-top: 30px;">
+        <button type="submit" class="btn btn-primary btn-submit">
             🗳️ Create Poll
         </button>
     </form>
@@ -56,39 +56,58 @@ function addChoice() {
     const container = document.getElementById('choices-container');
     const newChoice = document.createElement('div');
     newChoice.className = 'choice-input';
-    newChoice.innerHTML = `
-        <label>Choice ${choiceCount + 1}</label>
-        <input type="text" name="form-${choiceCount}-text" placeholder="Enter choice option">
-        <button type="button" onclick="removeChoice(this)" style="background: #dc3545; padding: 5px 10px; margin-left: 10px;">✕</button>
-    `;
+    
+    // Create new elements to ensure proper labeling and structure
+    const newLabel = document.createElement('label');
+    newLabel.textContent = `Choice ${choiceCount + 1}`;
+    newLabel.setAttribute('for', `id_form-${choiceCount}-text`);
+    
+    const newInput = document.createElement('input');
+    newInput.type = 'text';
+    newInput.name = `form-${choiceCount}-text`;
+    newInput.id = `id_form-${choiceCount}-text`;
+    newInput.className = 'form-input';
+    newInput.placeholder = 'Enter choice option';
+    newInput.required = true;
+    
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'btn btn-remove-choice';
+    removeButton.innerHTML = '✕';
+    removeButton.onclick = function() { removeChoice(this); };
+
+    newChoice.appendChild(newLabel);
+    newChoice.appendChild(newInput);
+    newChoice.appendChild(removeButton);
+    
     container.appendChild(newChoice);
     choiceCount++;
     document.getElementById('id_form-TOTAL_FORMS').value = choiceCount;
 }
 
 function removeChoice(button) {
-    if (choiceCount > 2) {
+    // Only allow removal if there are more than 2 choices
+    if (choiceCount > 2) { 
         button.parentElement.remove();
         choiceCount--;
+        
+        // Renumbering logic (crucial for formsets to submit correctly after removal)
+        const choiceInputs = document.querySelectorAll('.choice-input');
+        choiceInputs.forEach((input, index) => {
+            // Update labels
+            input.querySelector('label').textContent = `Choice ${index + 1}`;
+            input.querySelector('label').setAttribute('for', `id_form-${index}-text`);
+            
+            // Update input names and IDs
+            const inputField = input.querySelector('input');
+            inputField.name = `form-${index}-text`;
+            inputField.id = `id_form-${index}-text`;
+        });
+        
         document.getElementById('id_form-TOTAL_FORMS').value = choiceCount;
+    } else {
+        alert("A poll must have at least two choices.");
     }
 }
 </script>
-
-<style>
-.choice-input {
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.choice-input label {
-    min-width: 80px;
-    margin: 0;
-}
-.choice-input input {
-    flex: 1;
-    margin: 0;
-}
-</style>
 {% endblock %}

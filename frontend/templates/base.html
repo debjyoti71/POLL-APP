@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Poll App{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}"> 
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     <div class="container-wrapper">
-        <!-- Navigation Header -->
         <header class="navbar">
             <div class="navbar-content">
                 <div class="navbar-brand">
@@ -24,9 +24,9 @@
                         <a href="{% url 'create_poll' %}" class="nav-link nav-link-highlight">Create Poll</a>
                         <a href="{% url 'my_polls' %}" class="nav-link">My Polls</a>
                         {% if current_user.super_user %}
-                            <a href="/api/polls/" target="_blank" class="nav-link">API</a>
+                            <a href="/api/polls/" target="_blank" class="nav-link">⚙️ API</a>
                         {% endif %}
-                        <span class="nav-user">{{ current_user.username }}</span>
+                        <span class="nav-user">👋 {{ current_user.username }}</span>
                         <a href="{% url 'logout' %}" class="nav-link nav-logout">Logout</a>
                     {% else %}
                         <a href="{% url 'login' %}" class="nav-link">Login</a>
@@ -36,7 +36,6 @@
             </div>
         </header>
 
-        <!-- Messages Container -->
         {% if messages %}
         <div class="messages-container">
             {% for message in messages %}
@@ -50,14 +49,12 @@
         </div>
         {% endif %}
 
-        <!-- Main Content -->
         <main class="main-content">
-            <div class="card">
+            <div class="content-card">
                 {% block content %}{% endblock %}
             </div>
         </main>
 
-        <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
                 <p>&copy; 2025 PollHub. Create, Share, and Discover Polls.</p>
